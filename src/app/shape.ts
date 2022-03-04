@@ -7,13 +7,18 @@ export interface Shape {
     texture: any,
     material : any,
     position : {
-        x:0,
-        y:0,
-        z:0,
+        x:number,
+        y:number,
+        z:number,
+    },
+    rotation : {
+        x:number,
+        y:number,
+        z:number,
     },
     animation: {
-        x:0,
-        y:0,
-        z:0
+        x:number,
+        y:number,
+        z:number
     }
 }

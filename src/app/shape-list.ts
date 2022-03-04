@@ -11,7 +11,12 @@ export const ShapeList:Shape[] = [
         position: {
             x:0,
             y:0,
-            z:0,
+            z:0
+        },
+        rotation:{
+            x:5,
+            y:0,
+            z:0
         },
         animation: {
             x:0,
@@ -29,7 +34,12 @@ export const ShapeList:Shape[] = [
         position: {
             x:0,
             y:0,
-            z:0,
+            z:0
+        },
+        rotation:{
+            x:0,
+            y:0,
+            z:0
         },
         animation: {
             x:0,

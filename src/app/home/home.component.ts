@@ -23,13 +23,14 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     let renderer = this.renderer;
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( window.outerWidth, window.innerHeight );
     let scene = this.scene;
     let camera = this.camera;
     document.body.appendChild(this.renderer.domElement);
+    this.buildShapes();
 
     let pointLight = new THREE.PointLight(0xffffff);
-    pointLight.position.set(5,5,5)
+    pointLight.position.set(100,50,50)
 
     this.scene.add(pointLight);
 
@@ -37,19 +38,12 @@ export class HomeComponent implements OnInit {
 
     this.initGeo();
     this.initTextures();
-    for( let key of Object.keys(this.textures)) {
-      this.initBasicMat(key);
-    }
-    for(let key of Object.keys(this.geometries)){
-      this.initMesh(key, key, 'MUG' )
-    }
     
-
-    const controls = new OrbitControls(camera,renderer.domElement);
+    const waterTexture = new THREE.TextureLoader().load('./assets/underwater.jpg')
+    scene.background = waterTexture;
 
     var animate = function () {
       requestAnimationFrame( animate );
-      controls.update();
       renderer.render( scene, camera );
     };
 
@@ -76,17 +70,28 @@ export class HomeComponent implements OnInit {
 
   buildShapes(){
     for(let shape of this.shapeList){
-      let texture;
+      let geo;
       switch(shape.geometry.type){
         case 'ring' :
-          texture = new THREE.RingGeometry(shape.geometry.params[0],shape.geometry.params[1],shape.geometry.params[2]);
+          geo = new THREE.RingGeometry(shape.geometry.params[0],shape.geometry.params[1],shape.geometry.params[2]);
           break;
         case 'sphere' :
-          texture = new THREE.SphereGeometry(shape.geometry.params[0]);
+          geo = new THREE.SphereGeometry(shape.geometry.params[0]);
           break;
       }
+      let texture =  new THREE.TextureLoader().load(shape.texture);
+      let material = new THREE.MeshBasicMaterial( { map:texture, wireframe: true} );
+      let mesh = new THREE.Mesh( geo, material );
+      this.scene.add(mesh);
+      mesh.position.set(shape.position.x, shape.position.y , shape.position.z) ;
+      mesh.rotateX(shape.rotation.x);
+      mesh.rotateY(shape.rotation.y);
+      mesh.rotateZ(shape.rotation.z);
     }
   }
 
+  buildBackground(){
+
+  }
 }
 
