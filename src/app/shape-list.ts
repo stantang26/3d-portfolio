@@ -9,9 +9,9 @@ export const ShapeList:Shape[] = [
         texture: './assets/Mug_root_beer_logo.png',
         material: 'basic' ,
         position: {
-            x:0,
-            y:0,
-            z:0
+            x:-50,
+            y:-50,
+            z:-50
         },
         rotation:{
             x:5,
@@ -19,8 +19,8 @@ export const ShapeList:Shape[] = [
             z:0
         },
         animation: {
-            x:0,
-            y:0,
+            x:0.01,
+            y:0.01,
             z:0
         }
     },{
@@ -32,18 +32,18 @@ export const ShapeList:Shape[] = [
         texture: './assets/Mug_root_beer_logo.png',
         material: 'basic' ,
         position: {
-            x:0,
-            y:0,
-            z:0
+            x:-50,
+            y:-50,
+            z:-50
         },
         rotation:{
-            x:0,
+            x:5,
             y:0,
             z:0
         },
         animation: {
-            x:0,
-            y:0,
+            x:0.01,
+            y:0.01,
             z:0
         }
     }
