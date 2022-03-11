@@ -20,14 +20,17 @@ export class HomeComponent implements OnInit {
   materials:any = [];
   meshes:any = {};
   background:any = {};
+  scroll:number = 0;
 
   @HostListener('window:scroll',['$event'])
   onScroll(){
-    let t = document.body.getBoundingClientRect().top;
-    console.log(t)
-    this.camera.position.x = t*-0.0001;
-    this.camera.position.y = t*-0.0001;
-    this.camera.position.z = t*-0.01;
+    let scroll = document.body.getBoundingClientRect().top;
+    let change = scroll-this.scroll
+    this.camera.position.x += change*-0.001;
+    this.camera.position.y += change*-0.001;
+    this.camera.position.z += change*0.1;
+    console.log(scroll)
+    this.scroll = scroll;
   }
 
   constructor() { }
@@ -55,7 +58,7 @@ export class HomeComponent implements OnInit {
 
     this.scene.add(pointLight);
 
-    this.camera.position.z = 30;
+    this.camera.position.z = 100;
 
     this.initGeo();
     this.initTextures();
@@ -135,16 +138,16 @@ export class HomeComponent implements OnInit {
   }
 
   buildBackground(){
-    const count = THREE.MathUtils.randInt(50,100);
+    const count = THREE.MathUtils.randInt(100,200);
     const speed = THREE.MathUtils.randInt(50,100);
     const direction = THREE.MathUtils.randInt(1,3);
     for(let i = 0; i < count; i++){
       const geometry = new THREE.SphereGeometry(0.25,24,24);
       const material = new THREE.MeshBasicMaterial({color:0xffffff});
       const obj = new THREE.Mesh(geometry, material);
-      let x = THREE.MathUtils.randFloatSpread(100);
-      let y = THREE.MathUtils.randFloatSpread(100);
-      let z = THREE.MathUtils.randFloatSpread(100);
+      let x = THREE.MathUtils.randFloatSpread(200);
+      let y = THREE.MathUtils.randFloatSpread(200);
+      let z = THREE.MathUtils.randFloatSpread(200);
       obj.position.set(x,y,z);
       this.scene.add(obj)
     }
