@@ -4,5 +4,25 @@ canvas {
     left: 0;
     padding:0;
     margin:0;
-    z-index:-1
+    z-index:-100
 }
+
+.block1 {
+    position:relative;
+    background-color: rgba(255,255,255,0.3);
+    z-index: -1;
+    padding: 10px;
+}
+
+.block2 {
+    position:relative;
+    background-color: rgba(255,255,255,0.3);
+    z-index: -1;
+    padding: 10px;
+    float:right;
+}
+
+svg {
+    display:none
+}
+

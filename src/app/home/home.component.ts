@@ -2,6 +2,11 @@ import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
 import { ShapeList } from '../shape-list';
+import { Flow } from "three/examples/jsm/modifiers/CurveModifier";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { Fish } from './fish';
+import transformSVGPath from './transformSVGPath';
+
 
 @Component({
   selector: 'app-home',
@@ -12,14 +17,19 @@ export class HomeComponent implements OnInit {
   @ViewChild('renderCanvas', {static: true})
   public canvas: ElementRef<HTMLCanvasElement>;
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(75,window.innerWidth / window.innerHeight,0.1,1000);
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth/ window.innerHeight,
+    0.01,
+    2000
+  )
   renderer : any;
   shapeList = ShapeList;
   geometries:any = [];
   textures:any = [];
   materials:any = [];
   meshes:any = {};
-  background:any = {};
+  background:any = [];
   scroll:number = 0;
 
   @HostListener('window:scroll',['$event'])
@@ -27,9 +37,8 @@ export class HomeComponent implements OnInit {
     let scroll = document.body.getBoundingClientRect().top;
     let change = scroll-this.scroll
     this.camera.position.x += change*-0.001;
-    this.camera.position.y += change*-0.001;
-    this.camera.position.z += change*0.1;
-    console.log(scroll)
+    this.camera.position.y += change*0.1;
+    this.camera.position.z += change*0.001;
     this.scroll = scroll;
   }
 
@@ -50,18 +59,18 @@ export class HomeComponent implements OnInit {
     this.buildShapes();
     console.log(this.meshes)
 
-    let pointLight = new THREE.PointLight(0xffffff);
-    pointLight.position.set(0,0,0)
+    let ambLight = new THREE.AmbientLight(0xffffff, 1.25);
+    scene.add(ambLight);
 
-    let lightHelper = new THREE.PointLightHelper(pointLight);
-    scene.add(lightHelper)
-
-    this.scene.add(pointLight);
-
-    this.camera.position.z = 100;
+    camera.position.set(0, 1, 10);
+    camera.lookAt(0, 0, 0);
+    scene.add(camera);
 
     this.initGeo();
     this.initTextures();
+
+    const axesHelper = new THREE.AxesHelper( 5 );
+    scene.add( axesHelper );
     
     const waterTexture = new THREE.TextureLoader().load('./assets/underwater.jpg')
     scene.background = waterTexture;
@@ -71,7 +80,52 @@ export class HomeComponent implements OnInit {
       renderer.render( scene, camera );
       
     };
+    let shark
+    const loader = new GLTFLoader()
+    loader.load("./assets/scene.gltf", (gltf) => {
+      shark= gltf.scene
+      scene.add(shark)
+      const svg = document.getElementById("circle");
+      console.log(svg?.getAttribute('viewBox'))
+      const points = this.getSVGPoints(svg,0.2,100)
+      this.showLine(points,scene)
+      console.log(shark )
+    },function(xhr){
+      console.log(xhr.loaded/xhr.total)
+
+    })
+    animate()
+    
    this.startLoop(camera,scene,renderer);
+  }
+
+  showLine(points:any, scene:any) {
+    const line = new THREE.LineLoop(
+			new THREE.BufferGeometry().setFromPoints(points),
+			new THREE.LineBasicMaterial({ color: 0xffff })
+		);
+		line.geometry.center();
+
+		scene.add(line);
+    console.log(line)
+  }
+
+  getSVGPoints(svg : any, scale: number, pcount:number ) {
+    const viewBox = svg?.getAttribute('viewBox').split(' ')
+    const width = parseFloat(viewBox[2])
+    const height = parseFloat(viewBox[3])
+    const path = svg?.querySelector('path').getAttribute('d')
+
+    const shape =  transformSVGPath(path);
+    const points = shape.getPoints(pcount).map((point:any) => {
+      let v = new THREE.Vector3(point.x - width/2, 0, point.y - height/2)
+      v = v.multiplyScalar(scale)
+      return v
+    })
+
+    return points
+    
+
   }
 
   startLoop(camera : any, scene : any, renderer : any): void {
@@ -93,6 +147,12 @@ export class HomeComponent implements OnInit {
         this.meshes[shape.name].translateZ(shape.animation.z);
       }
     }
+    for(let obj of this.background){
+      obj.data.translateX(obj.speedx)
+      obj.data.translateY(obj.speedy)
+    }
+      
+      
   }
 
   initGeo(): void {
@@ -139,20 +199,30 @@ export class HomeComponent implements OnInit {
 
   buildBackground(){
     const count = THREE.MathUtils.randInt(100,200);
-    const speed = THREE.MathUtils.randInt(50,100);
-    const direction = THREE.MathUtils.randInt(1,3);
     for(let i = 0; i < count; i++){
+      const speedx = THREE.MathUtils.randFloatSpread(0.3);
+      const speedy = THREE.MathUtils.randFloat(-0.1,0);
       const geometry = new THREE.SphereGeometry(0.25,24,24);
       const material = new THREE.MeshBasicMaterial({color:0xffffff});
       const obj = new THREE.Mesh(geometry, material);
       let x = THREE.MathUtils.randFloatSpread(200);
-      let y = THREE.MathUtils.randFloatSpread(200);
+      let y = THREE.MathUtils.randFloat(-100,300);
       let z = THREE.MathUtils.randFloatSpread(200);
       obj.position.set(x,y,z);
       this.scene.add(obj)
+      let object = {
+        data: obj,
+        speedx: speedx,
+        speedy: speedy,
+        x:x,
+        y:y
+      }
+      this.background.push(object);
     }
     
   }
+
+
 
   moveCamera(){
 
