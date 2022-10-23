@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
   @ViewChild('renderCanvas', {static: true})
   public canvas: ElementRef<HTMLCanvasElement>;
   scene = new THREE.Scene();
+  flow:any;
   camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth/ window.innerHeight,
@@ -36,10 +37,13 @@ export class HomeComponent implements OnInit {
   onScroll(){
     let scroll = document.body.getBoundingClientRect().top;
     let change = scroll-this.scroll
-    this.camera.position.x += change*-0.001;
-    this.camera.position.y += change*0.1;
-    this.camera.position.z += change*0.001;
+    this.camera.position.z += change*-0.001;
+    this.camera.position.x -= change*0.1;
+    this.camera.position.y += change*0.001;
     this.scroll = scroll;
+    let color = Math.trunc(47 - 0.5*this.camera.position.x) + "," + Math.trunc(163 - this.camera.position.x) + "," + Math.trunc(176 - this.camera.position.x) 
+    console.log(color)
+    this.scene.fog = new THREE.Fog(new THREE.Color("rgb(" + color + ")"), -1,20)
   }
 
   constructor() { }
@@ -55,40 +59,52 @@ export class HomeComponent implements OnInit {
     renderer.setSize( window.outerWidth, window.innerHeight );
     let scene = this.scene;
     let camera = this.camera;
+    camera.up.set(-1,0,0);
     document.body.appendChild(this.renderer.domElement);
     this.buildShapes();
     console.log(this.meshes)
 
-    let ambLight = new THREE.AmbientLight(0xffffff, 1.25);
-    scene.add(ambLight);
-
-    camera.position.set(0, 1, 10);
-    camera.lookAt(0, 0, 0);
+    let light = new THREE.DirectionalLight( 0xffffff, 2.5 )
+    let lh = new THREE.DirectionalLightHelper(light)
+    light.position.set(-5,0,0)
+    scene.add(light.target)
+    light.target.position.set(1,0,10)
+    scene.add(light);
+    scene.add(lh)
+    scene.fog = new THREE.Fog(0x2A9EAB, -1,20)
+    camera.position.set(-1, 12, 0);
+    camera.lookAt(1, 0, 0);
     scene.add(camera);
 
     this.initGeo();
     this.initTextures();
 
-    const axesHelper = new THREE.AxesHelper( 5 );
-    scene.add( axesHelper );
+    // const axesHelper = new THREE.AxesHelper( 5 );
+    // scene.add( axesHelper );
     
     const waterTexture = new THREE.TextureLoader().load('./assets/underwater.jpg')
-    scene.background = waterTexture;
+    scene.background =  waterTexture
 
-    var animate = function () {
+    var animate =  () => {
       requestAnimationFrame( animate );
+      this.flow.moveAlongCurve(0.001);
+      this.tick();
       renderer.render( scene, camera );
       
     };
     let shark
     const loader = new GLTFLoader()
-    loader.load("./assets/scene.gltf", (gltf) => {
+    loader.load("./assets/shark1.glb", (gltf) => {
       shark= gltf.scene
-      scene.add(shark)
+      console.log(shark)
       const svg = document.getElementById("circle");
       console.log(svg?.getAttribute('viewBox'))
-      const points = this.getSVGPoints(svg,0.2,100)
-      this.showLine(points,scene)
+      const points = this.getSVGPoints(svg,0.3,100)
+      const fpoints = this.getFishPointsFromPoints(points);
+      this.showLine(fpoints,scene)
+
+      let curve = new THREE.CatmullRomCurve3(fpoints, true);
+      this.followPoints(curve,shark)
       console.log(shark )
     },function(xhr){
       console.log(xhr.loaded/xhr.total)
@@ -97,6 +113,31 @@ export class HomeComponent implements OnInit {
     animate()
     
    this.startLoop(camera,scene,renderer);
+  }
+
+  getFishPointsFromPoints(points:any){
+    const fishPoints = [];
+    let pointCount = 100, frequency = 14, amplitude = 0.10;
+    console.log(frequency, amplitude);
+    const curve = new THREE.CatmullRomCurve3(points);
+    for (let i = 0; i < pointCount; i++) {
+      const t = i / pointCount;
+      const angle = (i / (pointCount / frequency)) % 1;
+      const displacement = Math.sin(Math.PI * 2 * angle) * amplitude;
+      let point = curve.getPoint(t);
+      const tangeant = curve.getTangent(t);
+      const normal = tangeant.clone().cross(new THREE.Vector3(0,1, 0));
+  
+      point = point.add(normal.multiplyScalar(displacement));
+      fishPoints.push(point);
+    }
+    return fishPoints;
+  };
+
+  followPoints( curve: any, shark: any){
+  this.flow = new Flow(shark);
+	this.flow.updateCurve(0, curve);
+	this.scene.add(this.flow.object3D);
   }
 
   showLine(points:any, scene:any) {
@@ -152,7 +193,6 @@ export class HomeComponent implements OnInit {
       obj.data.translateY(obj.speedy)
     }
       
-      
   }
 
   initGeo(): void {
@@ -198,15 +238,15 @@ export class HomeComponent implements OnInit {
   }
 
   buildBackground(){
-    const count = THREE.MathUtils.randInt(100,200);
+    const count = THREE.MathUtils.randInt(50,70);
     for(let i = 0; i < count; i++){
-      const speedx = THREE.MathUtils.randFloatSpread(0.3);
-      const speedy = THREE.MathUtils.randFloat(-0.1,0);
+      const speedy = THREE.MathUtils.randFloat(-0.1,0.1);
+      const speedx = THREE.MathUtils.randFloat(0.1,0);
       const geometry = new THREE.SphereGeometry(0.25,24,24);
       const material = new THREE.MeshBasicMaterial({color:0xffffff});
       const obj = new THREE.Mesh(geometry, material);
-      let x = THREE.MathUtils.randFloatSpread(200);
-      let y = THREE.MathUtils.randFloat(-100,300);
+      let x = THREE.MathUtils.randFloat(-100,50);
+      let y = THREE.MathUtils.randFloat(-50,0);
       let z = THREE.MathUtils.randFloatSpread(200);
       obj.position.set(x,y,z);
       this.scene.add(obj)

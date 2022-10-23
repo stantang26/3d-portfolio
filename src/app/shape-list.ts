@@ -9,7 +9,7 @@ export const ShapeList:Shape[] = [
         texture: './assets/Mug_root_beer_logo.png',
         material: 'basic' ,
         position: {
-            x:-50,
+            x:150,
             y:-50,
             z:-50
         },
@@ -32,7 +32,7 @@ export const ShapeList:Shape[] = [
         texture: './assets/Mug_root_beer_logo.png',
         material: 'basic' ,
         position: {
-            x:-50,
+            x:150,
             y:-50,
             z:-50
         },
