@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { ShapeList } from '../shape-list';
 import { Flow } from "three/examples/jsm/modifiers/CurveModifier";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { Fish } from './fish';
+
 import transformSVGPath from './transformSVGPath';
 
 
@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit {
       console.log(svg?.getAttribute('viewBox'))
       const points = this.getSVGPoints(svg,0.3,100)
       const fpoints = this.getFishPointsFromPoints(points);
-      this.showLine(fpoints,scene)
+      //this.showLine(fpoints,scene)
 
       let curve = new THREE.CatmullRomCurve3(fpoints, true);
       this.followPoints(curve,shark)

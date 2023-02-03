@@ -6,11 +6,13 @@ canvas {
     margin:0;
     z-index:-100
 }
-
+main {
+    position: absolute;
+}
 .block1 {
     position:relative;
-    background-color: rgba(255,255,255,0.3);
-    z-index: -1;
+    background-color: rgba(255, 5, 5, 0.3);
+    z-index: -1000;
     padding: 10px;
 }
 
