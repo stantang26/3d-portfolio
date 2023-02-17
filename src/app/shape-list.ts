@@ -76,7 +76,7 @@ export const ShapeList:Shape[] = [
             type: 'box',
             params: [10,10,10]
         },
-        texture: './assets/Unchained.png',
+        texture: './assets/colosseum.png',
         material: 'basic' ,
         position: {
             x:105,
