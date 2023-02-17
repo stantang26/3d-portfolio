@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, HostBinding, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
 import { ShapeList } from '../shape-list';
@@ -37,13 +37,16 @@ export class HomeComponent implements OnInit {
   onScroll(){
     let scroll = document.body.getBoundingClientRect().top;
     let change = scroll-this.scroll
-    this.camera.position.z += change*-0.001;
-    this.camera.position.x -= change*0.1;
-    this.camera.position.y += change*0.001;
+    this.camera.position.x -= change*0.01;
+    for(let shape of this.shapeList){
+      if(this.meshes[shape.name]){
+        this.meshes[shape.name].position.x += 0.015*change*shape.animation.x;
+        this.meshes[shape.name].position.y +=0.015*change*shape.animation.y;
+        this.meshes[shape.name].position.z += 0.015*change*shape.animation.z;
+        this.meshes[shape.name].rotateZ(0.00104*change);
+      }
+    }
     this.scroll = scroll;
-    let color = Math.trunc(47 - 0.5*this.camera.position.x) + "," + Math.trunc(163 - this.camera.position.x) + "," + Math.trunc(176 - this.camera.position.x) 
-    console.log(color)
-    this.scene.fog = new THREE.Fog(new THREE.Color("rgb(" + color + ")"), -1,20)
   }
 
   constructor() { }
@@ -64,16 +67,13 @@ export class HomeComponent implements OnInit {
     this.buildShapes();
     console.log(this.meshes)
 
-    let light = new THREE.DirectionalLight( 0xffffff, 2.5 )
-    let lh = new THREE.DirectionalLightHelper(light)
+    let light = new THREE.AmbientLight();
+
     light.position.set(-5,0,0)
-    scene.add(light.target)
-    light.target.position.set(1,0,10)
     scene.add(light);
-    scene.add(lh)
-    scene.fog = new THREE.Fog(0x2A9EAB, -1,20)
-    camera.position.set(-1, 12, 0);
-    camera.lookAt(1, 0, 0);
+    scene.fog = new THREE.Fog(0x2A9EAB, 3,20)
+    camera.position.set(-1, 15, 0);
+    camera.lookAt(0, 0, 0);
     scene.add(camera);
 
     this.initGeo();
@@ -105,9 +105,7 @@ export class HomeComponent implements OnInit {
 
       let curve = new THREE.CatmullRomCurve3(fpoints, true);
       this.followPoints(curve,shark)
-      console.log(shark )
     },function(xhr){
-      console.log(xhr.loaded/xhr.total)
 
     })
     animate()
@@ -181,13 +179,6 @@ export class HomeComponent implements OnInit {
   }
 
   tick(): void{
-    for(let shape of this.shapeList){
-      if(this.meshes[shape.name]){
-        this.meshes[shape.name].translateX(shape.animation.x);
-        this.meshes[shape.name].translateY(shape.animation.y);
-        this.meshes[shape.name].translateZ(shape.animation.z);
-      }
-    }
     for(let obj of this.background){
       obj.data.translateX(obj.speedx)
       obj.data.translateY(obj.speedy)
@@ -213,6 +204,7 @@ export class HomeComponent implements OnInit {
 
   }
 
+
   buildShapes(){
     this.buildBackground()
     for(let shape of this.shapeList){
@@ -224,6 +216,15 @@ export class HomeComponent implements OnInit {
         case 'sphere' :
           geo = new THREE.SphereGeometry(shape.geometry.params[0]);
           break;
+        case 'box' :
+          geo = new THREE.BoxGeometry(shape.geometry.params[0],shape.geometry.params[1],shape.geometry.params[2]);
+          break;
+        case 'tetrahedron':
+          geo =new THREE.TetrahedronGeometry(shape.geometry.params[0],shape.geometry.params[1]);
+          break;
+          case 'plane':
+            geo =new THREE.PlaneGeometry(shape.geometry.params[0],shape.geometry.params[1],shape.geometry.params[2],shape.geometry.params[3]);
+            break;
       }
       let texture =  new THREE.TextureLoader().load(shape.texture);
       let material = new THREE.MeshBasicMaterial( { map:texture} );

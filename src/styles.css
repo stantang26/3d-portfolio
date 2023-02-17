@@ -1,8 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~animate.css/animate.min.css';
 body{ margin: 0; }
 
 main {
     position:absolute;
     padding:50px;
     opacity:0;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    overflow-y: scroll;
+    background: rgb(255, 255, 255);
+    box-shadow: inset 0 0 4px #707070;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(0, 153, 255);
+    border-radius: 10px;
 }

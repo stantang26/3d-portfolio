@@ -1,50 +1,97 @@
 import { Shape } from "./shape";
 export const ShapeList:Shape[] = [
     {
-        name: 'planet ring',
+        name: 'subject',
         geometry: {
-            type: 'ring',
-            params: [15,20,100]
+            type: 'box',
+            params: [5,5,5]
         },
-        texture: './assets/Mug_root_beer_logo.png',
+        texture: './assets/Subject.png',
         material: 'basic' ,
         position: {
-            x:150,
-            y:-50,
-            z:-50
+            x:15,
+            y:20,
+            z:6
         },
         rotation:{
-            x:5,
-            y:0,
-            z:0
+            x:0,
+            y:Math.PI/2,
+            z:0 
         },
         animation: {
-            x:0.01,
-            y:0.01,
+            x:0.5,
+            y:1,
             z:0
+        }
+    },
+    {
+        name: 'planet ring',
+        geometry: {
+            type: 'box',
+            params: [13,10,10]
+        },
+        texture: './assets/vidshare.png',
+        material: 'basic' ,
+        position: {
+            x:47.5,
+            y:-20.5,
+            z:44
+        },
+        rotation:{
+            x:0,
+            y:1.5,
+            z:Math.PI/2
+        },
+        animation: {
+            x:1.3,
+            y:-0.93,
+            z:2
         }
     },{
         name: 'planet',
         geometry: {
-            type: 'sphere',
-            params: [10]
+            type: 'box',
+            params: [10,10,10]
         },
-        texture: './assets/Mug_root_beer_logo.png',
+        texture: './assets/Unchained.png',
         material: 'basic' ,
         position: {
-            x:150,
-            y:-50,
-            z:-50
+            x:61,
+            y:-17,
+            z:-30
         },
         rotation:{
-            x:5,
-            y:0,
-            z:0
+            x:1,
+            y:-1,
+            z:1
         },
         animation: {
-            x:0.01,
-            y:0.01,
-            z:0
+            x:1,
+            y:-0.5,
+            z:-1
+        }
+    },{
+        name: 'colosseum',
+        geometry: {
+            type: 'box',
+            params: [10,10,10]
+        },
+        texture: './assets/Unchained.png',
+        material: 'basic' ,
+        position: {
+            x:105,
+            y:-24,
+            z:43
+        },
+        rotation:{
+            x:2,
+            y:-1,
+            z:1
+        },
+        animation: {
+            x:1.5,
+            y:-0.53,
+            z:1
         }
     }
 ];

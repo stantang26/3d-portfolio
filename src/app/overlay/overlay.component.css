@@ -1,4 +1,8 @@
-p {
+.block1 {
     z-index: -1;
     position: absolute;
+    color: black;
+    padding-top:1000px;
+    text-align: center;
+    width:100%;
 }
