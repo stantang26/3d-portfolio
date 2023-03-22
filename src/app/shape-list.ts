@@ -34,8 +34,8 @@ export const ShapeList:Shape[] = [
         material: 'basic' ,
         position: {
             x:47.5,
-            y:-20.5,
-            z:44
+            y:-21.5,
+            z:44.5
         },
         rotation:{
             x:0,
